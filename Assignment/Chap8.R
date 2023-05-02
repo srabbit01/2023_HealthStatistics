@@ -2,10 +2,13 @@
 
 ### 9.
 group_=read.csv('D:/GitHub/2023_HealthStatistics/Assignment/data/group.csv')
-group_
-group_$group=as.factor(group_$group)
-group_$group_num=ifelse(group_$group=="A",1,ifelse(group_$group=="B",2,3))
-anova(lm(group_num~value,group_))
+summary(group_)
+group_$value=as.character(group_$value)
+group_=data.frame(group_)
+# group_$group=as.factor(group_$group)
+# group_$group_num=ifelse(group_$group=="A",1,ifelse(group_$group=="B",2,3))
+# group_$group_num=as.factor(group_$group_num)
+anova(lm(group~value,group_))
 summary(aov(group_num~value,group_))
 '''
             Df Sum Sq Mean Sq F value Pr(>F)  
@@ -16,7 +19,21 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 '''
 ## 결과적으로, p-value=0.0395<alpha=0.05기 때문에 귀무가설 기각
 ## 즉, 세 집단 중 한 집단 이상 표본 평균이 유의한 차이가 있음
+group<-rep(c("A","B","C"),c(19,19,13))
+value=c(18,18,20,21,23,23,24,26,26,27,28,29,29,29,30,30,30,30,32,10,16,22,22,23,26,28,28,28,29,29,30,31,32,32,33,33,38,39,17,24,26,27,29,30,30,33,34,35,35,36,9)
+group_<-data.frame(cbind(group,value))
+fit<-lm(value~group,data=group_) 
+anova(fit)
+'''
+Analysis of Variance Table
 
+Response: value
+          Df  Sum Sq Mean Sq F value Pr(>F)
+group      2   47.64  23.821  0.5821 0.5626
+Residuals 48 1964.40  40.925 
+'''
+#summary(fit)
+summary(aov(value~group,data=group_))
 
 ### 10.
 hos=read.csv('D:/GitHub/2023_HealthStatistics/Assignment/data/hospital.csv')
