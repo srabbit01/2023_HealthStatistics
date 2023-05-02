@@ -5,6 +5,7 @@ group_=read.csv('D:/GitHub/2023_HealthStatistics/Assignment/data/group.csv')
 group_
 group_$group=as.factor(group_$group)
 group_$group_num=ifelse(group_$group=="A",1,ifelse(group_$group=="B",2,3))
+anova(lm(group_num~value,group_))
 summary(aov(group_num~value,group_))
 '''
             Df Sum Sq Mean Sq F value Pr(>F)  
