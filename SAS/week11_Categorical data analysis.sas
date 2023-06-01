@@ -1,0 +1,160 @@
+**********************************************
+Independence Test
+**********************************************;
+/****Example 11.3.1****/
+/*Data*/
+DATA PRACTICE1;
+INPUT VARIABLE1 $ VARIABLE2 $ COUNT;
+CARDS;
+A YES 294
+A NO 921
+B YES 98
+B NO 2862
+C YES 50
+C NO 3064
+D YES 203
+D NO 2652
+;
+RUN;
+/*Chi Squared Test*/
+PROC FREQ DATA=PRACTICE1 ORDER=DATA;
+		WEIGHT COUNT;
+		TABLES VARIABLE1 * VARIABLE2 / CHISQ EXPECTED NOROW NOCOL NOPERCENT;
+RUN;
+
+
+/****Example 11.3.2****/
+/*Data*/
+DATA PRACTICE2;
+INPUT VARIABLE1 $ VARIABLE2 $10. COUNT;
+CARDS;
+SMOKE_Y ALCOHOL_Y 131
+SMOKE_Y ALCOHOL_N 52
+SMOKE_N ALCOHOL_Y 14
+SMOKE_N ALCOHOL_N 36
+;
+RUN;
+/*Chi Squared Test*/
+PROC FREQ DATA=PRACTICE2 ORDER=DATA;
+		WEIGHT COUNT;
+		TABLES VARIABLE1 * VARIABLE2 / CHISQ EXPECTED NOROW NOCOL NOPERCENT;
+RUN;
+
+
+
+**********************************************
+Homogeneity Test
+**********************************************;
+/*Data*/
+DATA PRACTICE3;
+INPUT TYPE $ CATEGORY $ COUNT;
+CARDS;
+A LT_18Y 28
+A 18Y+ 35
+B LT_18Y 19
+B 18Y+ 38
+C LT_18Y 41
+C 18Y+ 44
+D LT_18Y 53
+D 18Y+ 60
+;
+RUN;
+/*Chi Squared Test*/
+PROC FREQ DATA=PRACTICE3 ORDER=DATA;
+		WEIGHT COUNT;
+		TABLES TYPE * CATEGORY / CHISQ EXPECTED NOROW NOPERCENT;
+RUN;
+
+
+
+**********************************************
+Fisher's exact Test
+**********************************************;
+/*IF some EXPECTED FREQUENCY are LESS THAN 5*/
+/*Data*/
+DATA PRACTICE4;
+INPUT TYPE $ CATEGORY $ COUNT;
+CARDS;
+A LT_18Y 0
+A 18Y+ 1
+B LT_18Y 19
+B 18Y+ 38
+C LT_18Y 41
+C 18Y+ 44
+D LT_18Y 53
+D 18Y+ 60
+;
+RUN;
+/*Fisher's exact Chi Squared Test*/
+PROC FREQ DATA=PRACTICE4 ORDER=DATA;
+		WEIGHT COUNT;
+		TABLES TYPE * CATEGORY / CHISQ EXPECTED NOROW NOPERCENT FISHER;
+RUN;
+
+
+
+**********************************************
+Relative Risk (RR) and Odds Ratio (OR)
+**********************************************;
+/*Data*/
+DATA PRACTICE5;
+LENGTH EXPOSURE $20 OUTCOME $20;
+INPUT EXPOSURE $ OUTCOME $ COUNT;
+CARDS;
+SMOKING DISEASE 26
+SMOKING DISEASE_FREE 380
+NON_SMOKING DISEASE 178
+NON_SMOKING DISEASE_FREE 3386
+;
+RUN;
+/*RR/OR: PROC FREQ with MEASURES option*/
+PROC FREQ DATA=PRACTICE5 ORDER=DATA;
+		WEIGHT COUNT;
+		TABLES EXPOSURE * OUTCOME / MEASURES;
+RUN;
+
+/*IF OUTCOME IS NOT RARE CASE*/
+/*Data*/
+DATA PRACTICE6;
+LENGTH EXPOSURE $20 OUTCOME $20;
+INPUT EXPOSURE $ OUTCOME $ COUNT;
+CARDS;
+SMOKING DISEASE 300
+SMOKING DISEASE_FREE 380
+NON_SMOKING DISEASE 1000
+NON_SMOKING DISEASE_FREE 3386
+;
+RUN;
+/*RR/OR: PROC FREQ with MEASURES option for count data*/
+/*OR and RR are QUITE DIFFERENT when outcome is not rare*/
+PROC FREQ DATA=PRACTICE6 ORDER=DATA;
+		WEIGHT COUNT;
+		TABLES EXPOSURE * OUTCOME / MEASURES;
+RUN;
+
+
+
+**********************************************
+Mantel-Haenszel statistics
+**********************************************;
+/*Data*/
+PROC IMPORT datafile="D:\alligator.csv"
+	OUT=DATA_AG 
+	DBMS=csv REPLACE ;
+	GETNAMES=YES ;
+	GUESSINGROWS=32767 ;
+RUN ;
+DATA DATA_AG;
+	LENGTH FOOD_2 $20 ;
+	RETAIN LAKE SIZE FOOD FOOD_2 COUNT;
+	SET DATA_AG;
+
+	IF FOOD="Fish" THEN FOOD_2="Fish" ; 	
+	ELSE FOOD_2="Other" ;
+RUN ;
+/* Mantel-Haenszel statistics (confounder variable: LAKE) */
+PROC FREQ DATA=DATA_AG; 
+	WEIGHT COUNT ;
+	TABLES LAKE*SIZE*FOOD_2 / MEASURES CMH;
+RUN ;
+
